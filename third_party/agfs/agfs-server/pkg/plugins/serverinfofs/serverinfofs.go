@@ -239,7 +239,7 @@ func (fs *serverInfoFS) Read(path string, offset int64, size int64) ([]byte, err
 		data = []byte(fs.plugin.GetReadme())
 
 	default:
-		return nil, fmt.Errorf("no such file: %s", path)
+		return nil, filesystem.NewNotFoundError("read", path)
 	}
 
 	// if data is not ended by '\n' then add it

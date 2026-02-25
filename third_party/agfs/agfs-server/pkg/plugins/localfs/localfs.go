@@ -189,7 +189,7 @@ func (fs *LocalFS) Read(path string, offset int64, size int64) ([]byte, error) {
 	info, err := os.Stat(localPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("no such file: %s", path)
+			return nil, filesystem.NewNotFoundError("read", path)
 		}
 		return nil, fmt.Errorf("failed to stat: %w", err)
 	}
@@ -442,7 +442,7 @@ func (fs *LocalFS) Open(path string) (io.ReadCloser, error) {
 	f, err := os.Open(localPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("no such file: %s", path)
+			return nil, filesystem.NewNotFoundError("open", path)
 		}
 		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
@@ -554,7 +554,7 @@ func (fs *LocalFS) OpenStream(path string) (filesystem.StreamReader, error) {
 	info, err := os.Stat(localPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("no such file: %s", path)
+			return nil, filesystem.NewNotFoundError("grep", path)
 		}
 		return nil, fmt.Errorf("failed to stat: %w", err)
 	}
