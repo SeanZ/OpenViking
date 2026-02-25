@@ -55,22 +55,18 @@ class AGFSClient:
                         error_msg = "Operation not supported"
                     raise AGFSNotSupportedError(error_msg)
 
-                # Try to get error message from JSON response first (priority)
+                # Try to get error message from JSON response first
+                error_msg = None
                 try:
                     error_data = e.response.json()
                     error_msg = error_data.get("error", "")
-                    if error_msg:
-                        # Use the server's detailed error message
-                        raise AGFSClientError(error_msg)
                 except (ValueError, KeyError, TypeError):
-                    # If JSON parsing fails, fall through to generic status code messages
                     pass
-                except AGFSClientError:
-                    # Re-raise our own error
-                    raise
 
-                # Fallback to generic messages based on status codes
-                if status_code == 404:
+                # Always use AGFSHTTPError to preserve status_code
+                if error_msg:
+                    raise AGFSHTTPError(error_msg, status_code)
+                elif status_code == 404:
                     raise AGFSHTTPError("No such file or directory", status_code)
                 elif status_code == 403:
                     raise AGFSHTTPError("Permission denied", status_code)
