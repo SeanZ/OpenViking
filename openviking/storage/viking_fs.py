@@ -202,20 +202,20 @@ class VikingFS:
     async def rm(self, uri: str, recursive: bool = False) -> Dict[str, Any]:
         """Delete file/directory + recursively update vector index."""
         path = self._uri_to_path(uri)
-        uris_to_delete = await self._collect_uris(path, recursive)
+        target_uri = self._path_to_uri(path)
         result = self.agfs.rm(path, recursive)
-        if uris_to_delete:
-            await self._delete_from_vector_store(uris_to_delete)
+        await self._delete_from_vector_store([target_uri])
         return result
 
     async def mv(self, old_uri: str, new_uri: str) -> Dict[str, Any]:
         """Move file/directory + recursively update vector index."""
         old_path = self._uri_to_path(old_uri)
         new_path = self._uri_to_path(new_uri)
+        target_uri = self._path_to_uri(old_path)
         uris_to_move = await self._collect_uris(old_path, recursive=True)
+        uris_to_move.append(target_uri)
         result = self.agfs.mv(old_path, new_path)
-        if uris_to_move:
-            await self._update_vector_store_uris(uris_to_move, old_uri, new_uri)
+        await self._update_vector_store_uris(uris_to_move, old_uri, new_uri)
         return result
 
     async def grep(self, uri: str, pattern: str, case_insensitive: bool = False) -> Dict:
