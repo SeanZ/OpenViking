@@ -823,7 +823,7 @@ func (qfs *queueFS) Stat(p string) (*filesystem.FileInfo, error) {
 			}
 			if !hasChildren {
 				qfs.plugin.mu.RUnlock()
-				return nil, fmt.Errorf("no such file or directory: %s", p)
+				return nil, filesystem.NewNotFoundError("stat", p)
 			}
 		}
 		qfs.plugin.mu.RUnlock()
